@@ -5,6 +5,12 @@ ChatterBox is a Next.js (App Router) chat application scaffold originally starte
 
 This repository contains the frontend (Next.js app) and server API endpoints (Next.js API routes) that talk to MongoDB Atlas. The project keeps a lightweight Realm Web SDK as an optional runtime fallback, but server APIs are the primary data/auth path.
 
+        <p align="center">
+  <a href="https://jarvisai-f42y.onrender.com//">
+    <img src="https://img.shields.io/badge/View Demo-0077B5?style=for-the-badge&logo=linkedin&logoColor=white"/>
+  </a>
+</p>
+
 ## Quick links
 
 - Source: `src/` — main app code, components, and helpers
