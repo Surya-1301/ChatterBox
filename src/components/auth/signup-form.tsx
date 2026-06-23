@@ -16,7 +16,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
 import type { User } from '@/lib/types';
 import { app, Credentials } from '@/lib/realm';
 
@@ -177,7 +176,7 @@ export default function SignupForm() {
         <Button type="submit" className="w-full">
           Create Account
         </Button>
-        <Button type="button" variant="outline" className="w-full" onClick={() => signIn('google')}>
+        <Button type="button" variant="outline" className="w-full" onClick={() => { window.location.href = '/api/auth/google'; }}>
           Continue with Google
         </Button>
       </form>

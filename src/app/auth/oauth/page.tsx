@@ -8,10 +8,10 @@ export default function OAuthHandler({ searchParams }: { searchParams?: any }) {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
-    if (token) {
+    const user = params.get('user');
+    if (token && user) {
       localStorage.setItem('auth-token', token);
-      // Optionally fetch user info from server or decode token
-      // Redirect to chat
+      localStorage.setItem('currentUser', user);
       router.replace('/chat');
     } else {
       router.replace('/');
