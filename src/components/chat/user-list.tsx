@@ -211,9 +211,13 @@ export default function UserList({
   const renderContent = () => {
     return (
       <Tabs value={activeTab} onValueChange={handleTabChange} className="flex flex-col flex-1">
-        <TabsList className="grid w-full grid-cols-2 bg-transparent p-4">
-            <TabsTrigger value="chats" className="data-[state=active]:bg-sidebar-accent data-[state=active]:text-sidebar-accent-foreground">Chats</TabsTrigger>
-        <TabsTrigger value="groups" className="data-[state=active]:bg-sidebar-accent data-[state=active]:text-sidebar-accent-foreground">Groups</TabsTrigger>
+        <TabsList className="grid h-12 w-full grid-cols-2 rounded-none bg-transparent p-0">
+          <TabsTrigger value="chats" className="h-full rounded-none data-[state=active]:bg-sidebar-accent data-[state=active]:text-sidebar-accent-foreground">
+            Chats
+          </TabsTrigger>
+          <TabsTrigger value="groups" className="h-full rounded-none data-[state=active]:bg-sidebar-accent data-[state=active]:text-sidebar-accent-foreground">
+            Groups
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="chats" className="m-0">
           {/* Loading State */}
