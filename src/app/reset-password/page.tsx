@@ -6,16 +6,16 @@ export default function ResetPasswordPage({ searchParams }: any) {
   const tokenId = Array.isArray(searchParams?.tokenId) ? searchParams?.tokenId[0] : searchParams?.tokenId;
 
   return (
-    <div className="max-w-md mx-auto mt-20 p-6 bg-white rounded shadow">
-      <h1 className="text-2xl font-bold mb-4">Reset Password</h1>
-      {!token || !tokenId ? (
-        <div className="text-red-500 text-lg">
-          Invalid or missing reset link.<br />
-          Please use the password reset link sent to your email.
-        </div>
-      ) : (
+    <main className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+      <div className="w-full max-w-md rounded-lg border bg-card p-6 text-card-foreground shadow">
+        <h1 className="mb-2 text-2xl font-bold">Reset Password</h1>
+        <p className="mb-6 text-sm text-muted-foreground">
+          {!token || !tokenId
+            ? 'Enter your email and we will create a password reset link for your account.'
+            : 'Choose a new password for your account.'}
+        </p>
         <ResetPasswordForm token={token} tokenId={tokenId} />
-      )}
-    </div>
+      </div>
+    </main>
   );
 }
