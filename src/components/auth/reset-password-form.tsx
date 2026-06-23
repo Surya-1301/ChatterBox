@@ -11,6 +11,41 @@ type Props = {
   tokenId?: string;
 };
 
+async function sendResetEmailFromBrowser(email: string, resetUrl: string) {
+  const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+  const templateId = process.env.NEXT_PUBLIC_EMAILJS_RESET_TEMPLATE_ID || "template_ovxq7jl";
+  const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+
+  if (!serviceId || !publicKey) {
+    throw new Error("Missing NEXT_PUBLIC_EMAILJS_SERVICE_ID or NEXT_PUBLIC_EMAILJS_PUBLIC_KEY.");
+  }
+
+  const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      service_id: serviceId,
+      template_id: templateId,
+      user_id: publicKey,
+      template_params: {
+        to_email: email,
+        to_name: email,
+        email,
+        user_email: email,
+        reply_to: email,
+        reset_url: resetUrl,
+        reset_link: resetUrl,
+        link: resetUrl,
+        expires_in: "30 minutes",
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+}
+
 export default function ResetPasswordForm({ token, tokenId }: Props) {
   const router = useRouter();
   const { toast } = useToast();
@@ -20,6 +55,8 @@ export default function ResetPasswordForm({ token, tokenId }: Props) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [resetUrl, setResetUrl] = useState("");
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const [error, setError] = useState("");
   const hasResetToken = Boolean(token && tokenId);
 
@@ -28,9 +65,11 @@ export default function ResetPasswordForm({ token, tokenId }: Props) {
     setLoading(true);
     setError("");
     setResetUrl("");
+    setEmailSent(false);
+    setEmailError("");
 
     try {
-      const res = await fetch("/api/auth/password-reset/request", {
+      const res = await fetch("/api/auth/password-reset-request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -39,9 +78,29 @@ export default function ResetPasswordForm({ token, tokenId }: Props) {
 
       if (!res.ok) throw new Error(data?.error || "Unable to create reset link.");
 
+      let sent = Boolean(data.emailSent);
+      let sendError = data.emailError || "";
+
+      if (!sent && data.resetUrl && sendError.includes("non-browser environments")) {
+        try {
+          await sendResetEmailFromBrowser(email, data.resetUrl);
+          sent = true;
+          sendError = "";
+        } catch (browserSendError: any) {
+          sendError = browserSendError?.message || "EmailJS browser send failed.";
+        }
+      }
+
       setResetUrl(data.resetUrl || "");
+      setEmailSent(sent);
+      setEmailError(sendError);
       setSuccess(true);
-      toast({ title: "Reset link created", description: data.message });
+      toast({
+        title: sent ? "Reset email sent" : "Reset link created",
+        description: sent
+          ? "Check your inbox for the password reset link."
+          : data.message,
+      });
     } catch (err: any) {
       setError(err?.message || "Unable to create reset link.");
     } finally {
@@ -66,7 +125,7 @@ export default function ResetPasswordForm({ token, tokenId }: Props) {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/auth/password-reset/confirm", {
+      const res = await fetch("/api/auth/password-reset-confirm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, tokenId, password }),
@@ -88,8 +147,16 @@ export default function ResetPasswordForm({ token, tokenId }: Props) {
     return (
       <div className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          If an account exists for that email, a reset link has been created.
+          {emailSent
+            ? "If an account exists for that email, a reset link has been sent."
+            : "If an account exists for that email, a reset link has been created."}
         </p>
+        {emailError && (
+          <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+            <p className="font-medium">EmailJS did not send the email:</p>
+            <p className="mt-1 break-words">{emailError}</p>
+          </div>
+        )}
         {resetUrl && (
           <div className="rounded-md border bg-muted p-3 text-sm">
             <p className="mb-2 font-medium">Development reset link:</p>
