@@ -2,6 +2,12 @@
 
 ChatterBox is a feature-rich chat application built using Next.js, MongoDB Atlas, and WebRTC. It supports real-time messaging, audio/video calls, and Google OAuth authentication.
 
+<p align="center">
+  <a href="https://chatterbox-qd15.onrender.com/">
+    <img src="https://img.shields.io/badge/View Demo-0077B5?style=for-the-badge&logo=linkedin&logoColor=white"/>
+  </a>
+</p>
+
 ## Features
 
 - **Real-time Messaging**: Send and receive messages instantly.
